@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 
 namespace AI_labs;
@@ -16,7 +17,17 @@ public class NetworkCanvas: Canvas
     private readonly SolidColorBrush _nodeHighlightColor = Brushes.Khaki;
     private readonly SolidColorBrush _lineDefaultColor = Brushes.Black;
     private readonly SolidColorBrush _lineHighlightColor = Brushes.DimGray;
-    
+    private const int LabelFontSize = 24;
+    private readonly SolidColorBrush _labelColor = Brushes.LightSeaGreen;
+    private readonly SolidColorBrush _translucentBlack = new(new Color { A = 0x88, R = 0x00, G = 0x00, B = 0x00 });
+
+    private readonly DropShadowEffect _shadowEffect = new()
+    {
+        Color = Colors.Black,
+        BlurRadius = 3,
+        ShadowDepth = 3
+    };
+
     private readonly Network _network = new(0);
     private readonly List<Ellipse> _nodes = new();
 
@@ -38,6 +49,7 @@ public class NetworkCanvas: Canvas
     }
 
     private readonly Dictionary<Line, NodePair> _lines = new();
+    private readonly Dictionary<Line, Label> _labels = new();
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
@@ -153,11 +165,33 @@ public class NetworkCanvas: Canvas
         }
         else
         {
-            AddPath(_selectedNode, node);
-            _lineFromSelectedNode!.X2 = GetLeft(node) + NodeHalfSize;
-            _lineFromSelectedNode.Y2 = GetTop(node) + NodeHalfSize;
-            SetupListeners(_lineFromSelectedNode);
-            _lines.Add(_lineFromSelectedNode, new NodePair(_selectedNode, node, GetNodeIndex));
+            var length = LengthDialog.Prompt();
+            if (length != null) // add path with defined length
+            {
+                AddPath(_selectedNode, node, (int) length);
+                _lineFromSelectedNode!.X2 = GetLeft(node) + NodeHalfSize;
+                _lineFromSelectedNode.Y2 = GetTop(node) + NodeHalfSize;
+                SetupListeners(_lineFromSelectedNode);
+                _lines.Add(_lineFromSelectedNode, new NodePair(_selectedNode, node, GetNodeIndex));
+
+                var text = new Label
+                {
+                    Content = length.ToString(),
+                    FontSize = LabelFontSize,
+                    Foreground = _labelColor,
+                    FontWeight = FontWeights.Bold,
+                    Background = _translucentBlack,
+                    Effect = _shadowEffect
+                };
+                Children.Add(text);
+                SetLeft(text, (_lineFromSelectedNode.X1 + _lineFromSelectedNode.X2) / 2);
+                SetTop(text, (_lineFromSelectedNode.Y1 + _lineFromSelectedNode.Y2) / 2);
+                _labels.Add(_lineFromSelectedNode, text);
+            }
+            else // cancel adding path
+            {
+                Children.Remove(_lineFromSelectedNode);
+            }
             _lineFromSelectedNode = null;
             _selectedNode.Fill = _nodeDefaultColor;
             _selectedNode = null;
@@ -170,12 +204,20 @@ public class NetworkCanvas: Canvas
         _nodes.RemoveAt(nodeIndex);
         _network.RemoveNode(nodeIndex);
         Children.Remove(node);
+        var linesToRemove = new List<Line>();
         foreach (var (line, nodes) in _lines)
         {
-            if (nodes.A == nodeIndex || nodes.B == nodeIndex)
-            {
-                Children.Remove(line);
-            }
+            if (nodes.A != nodeIndex && nodes.B != nodeIndex) continue;
+            // if node A or node B is the node to remove
+            Children.Remove(line);
+            Children.Remove(_labels[line]);
+            linesToRemove.Add(line);
+        }
+        
+        foreach (var line in linesToRemove)
+        {
+            _lines.Remove(line);
+            _labels.Remove(line);
         }
 
         if (node != _selectedNode) return;
@@ -183,9 +225,9 @@ public class NetworkCanvas: Canvas
         _selectedNode = null;
     }
 
-    private void AddPath(Ellipse from, Ellipse to)
+    private void AddPath(Ellipse from, Ellipse to, int length)
     {
-        _network.AddPath(GetNodeIndex(from), GetNodeIndex(to), 1);
+        _network.AddPath(GetNodeIndex(from), GetNodeIndex(to), length);
     }
 
     private void HighlightLine(object sender, MouseEventArgs e)
@@ -200,10 +242,12 @@ public class NetworkCanvas: Canvas
 
     private void PromptLengthDialog(object sender, MouseButtonEventArgs e)
     {
-        var nodes = _lines[(sender as Line)!];
+        var line = (sender as Line)!;
+        var nodes = _lines[line];
         var initialLength = _network.GetLength(nodes.A, nodes.B);
         var newLength = LengthDialog.Prompt(initialLength);
         _network.SetPath(nodes.A, nodes.B, newLength ?? initialLength);
+        _labels[line].Content = newLength.ToString();
     }
 
     private int GetNodeIndex(Ellipse node)
