@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:AI_labs"
         mc:Ignorable="d"
-        Title="Path Length" Height="150" Width="200">
+        Title="Path Length" Height="150" Width="200" ResizeMode="NoResize">
     <Grid>
         <StackPanel>
             <TextBox x:Name="LengthValue" FontSize="20" Margin="10" TextChanged="OnTextChanged"/>

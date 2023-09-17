@@ -8,9 +8,10 @@ public partial class LengthDialog : Window
     private LengthDialog()
     {
         InitializeComponent();
+        LengthValue.Focus();
     }
 
-    private int Value;
+    private int _value;
 
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -18,7 +19,7 @@ public partial class LengthDialog : Window
         if (inputIsNumber && val > 0)
         {
             ConfirmButton.IsEnabled = true;
-            Value = val;
+            _value = val;
         }
         else ConfirmButton.IsEnabled = false;
     }
@@ -33,11 +34,15 @@ public partial class LengthDialog : Window
         var dialog = new LengthDialog();
         if (initialValue != null)
         {
-            dialog.Value = (int) initialValue;
+            dialog._value = (int) initialValue;
             dialog.LengthValue.Text = initialValue.ToString();
         }
+        else
+        {
+            dialog.ConfirmButton.IsEnabled = false;
+        }
         if (dialog.ShowDialog() != true) return null;
-        return dialog.Value;
+        return dialog._value;
 
     }
 }
