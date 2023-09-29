@@ -1,16 +1,15 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AI_labs.Optimization.AntColony;
 
-namespace AI_labs
+namespace AI_labs.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow
     {
-        //private IOptimizationAlgorithm _algorithm = new AntColonyOptimization();
-        
         public MainWindow()
         {
             InitializeComponent();
@@ -40,7 +39,7 @@ namespace AI_labs
 
         private void StartOptimization(object sender, RoutedEventArgs e)
         {
-            var aco = new AntColonyOptimization(Canvas.Network)
+            var aco = new AntColonyOptimization(Canvas.Network, new AntColonyOptimization.Parameters 
             {
                 Alpha = float.Parse(Alpha.Text),
                 Beta = float.Parse(Beta.Text),
@@ -49,9 +48,9 @@ namespace AI_labs
                 AntsNumber = int.Parse(AntsNumber.Text),
                 ColonyLifetime = int.Parse(ColonyLifetime.Text),
                 Home = Canvas.StartPoint
-            };
+            });
             var res = aco.Optimize();
-            Result.Text = $"{string.Join(" ", res.Route)} ({res.RouteLength})";
+            Result.Text = $"{string.Join(" ", res)} ({res.Length})";
         }
     }
 }

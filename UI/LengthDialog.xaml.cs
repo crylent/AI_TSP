@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AI_labs;
+namespace AI_labs.UI;
 
-public partial class LengthDialog : Window
+public partial class LengthDialog
 {
     private LengthDialog()
     {

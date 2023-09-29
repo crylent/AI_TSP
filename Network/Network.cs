@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace AI_labs;
+namespace AI_labs.Network;
 
 public class Network<T> where T: INumber<T>
 {
@@ -12,15 +12,15 @@ public class Network<T> where T: INumber<T>
 
     public static readonly T? NoPath = default;
 
-    protected Network(int size = 0, T? defaultLength = default)
+    protected Network(int size = 0, T? defaultValue = default)
     {
         for (var i = 0; i < size; i++)
         {
-            Matrix.Add(Enumerable.Repeat(defaultLength, i).ToList()!);
+            Matrix.Add(Enumerable.Repeat(defaultValue, i).ToList()!);
         }
     }
 
-    public T GetLength(int nodeA, int nodeB)
+    public T GetValue(int nodeA, int nodeB)
     {
         var (node1, node2) = OrderIndices(nodeA, nodeB);
         var length = Matrix[node1][node2];
@@ -33,7 +33,7 @@ public class Network<T> where T: INumber<T>
         {
             for (var j = 0; j < Matrix[i].Count; j++)
             {
-                if (GetLength(i, j) != NoPath) func(i, j);
+                if (GetValue(i, j) != NoPath) func(i, j);
             }
         }
     }

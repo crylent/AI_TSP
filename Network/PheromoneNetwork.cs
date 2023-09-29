@@ -1,4 +1,4 @@
-namespace AI_labs;
+namespace AI_labs.Network;
 
 public class PheromoneNetwork: MutableNetwork<float>
 {

@@ -6,8 +6,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using AI_labs.Network;
 
-namespace AI_labs;
+namespace AI_labs.UI;
 
 public class NetworkCanvas: Canvas
 {
@@ -179,11 +180,6 @@ public class NetworkCanvas: Canvas
         menu.Items.Add(item);
     }
 
-    private void a(object sender, RoutedEventArgs routedEventArgs)
-    {
-        
-    }
-
     private void SelectNode(Ellipse node)
     {
         if (_selectedNode == null)
@@ -284,7 +280,7 @@ public class NetworkCanvas: Canvas
     {
         var line = (sender as Line)!;
         var nodes = _lines[line];
-        var initialLength = _network.GetLength(nodes.A, nodes.B);
+        var initialLength = _network.GetValue(nodes.A, nodes.B);
         var newLength = LengthDialog.Prompt(initialLength);
         _network.SetPath(nodes.A, nodes.B, newLength ?? initialLength);
         _labels[line].Content = newLength.ToString();
