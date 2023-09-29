@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ public class NetworkCanvas: Canvas
     private readonly SolidColorBrush _nodeHighlightColor = Brushes.Khaki;
     private readonly SolidColorBrush _lineDefaultColor = Brushes.Black;
     private readonly SolidColorBrush _lineHighlightColor = Brushes.DimGray;
+    private readonly SolidColorBrush _routeColor = Brushes.MediumVioletRed;
     private const int LabelFontSize = 24;
     private readonly SolidColorBrush _labelColor = Brushes.LightSeaGreen;
     private readonly SolidColorBrush _translucentBlack = new(new Color { A = 0x88, R = 0x00, G = 0x00, B = 0x00 });
@@ -39,7 +41,7 @@ public class NetworkCanvas: Canvas
         private set;
     }
 
-    private struct NodePair
+    private readonly struct NodePair
     {
         public readonly int A;
         public readonly int B;
@@ -54,6 +56,36 @@ public class NetworkCanvas: Canvas
         public NodePair(Ellipse nodeA, Ellipse nodeB, Func<Ellipse, int> getNodeIndex) 
             : this(getNodeIndex(nodeA), getNodeIndex(nodeB)) 
         { }
+
+        // ReSharper disable once MemberCanBePrivate.Local
+        public bool Equals(NodePair other)
+        {
+            return A == other.A && B == other.B || A == other.B && B == other.A;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is NodePair other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                // ReSharper disable once ArrangeRedundantParentheses
+                return (A * 397) ^ B + (B * 397) ^ A;
+            }
+        }
+
+        public static bool operator ==(NodePair left, NodePair right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NodePair left, NodePair right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     private readonly Dictionary<Line, NodePair> _lines = new();
@@ -273,7 +305,7 @@ public class NetworkCanvas: Canvas
 
     private void ResetLine(object sender, MouseEventArgs e)
     {
-        (sender as Line)!.Stroke = _lineDefaultColor;
+        ResetLines();
     }
 
     private void PromptLengthDialog(object sender, MouseButtonEventArgs e)
@@ -283,11 +315,31 @@ public class NetworkCanvas: Canvas
         var initialLength = _network.GetValue(nodes.A, nodes.B);
         var newLength = LengthDialog.Prompt(initialLength);
         _network.SetPath(nodes.A, nodes.B, newLength ?? initialLength);
-        _labels[line].Content = newLength.ToString();
+        if (newLength != null) _labels[line].Content = newLength.ToString();
     }
 
     private int GetNodeIndex(Ellipse node)
     {
         return _nodes.IndexOf(node);
+    }
+
+    private void ResetLines()
+    {
+        foreach (var line in _lines.Keys)
+        {
+            line.Stroke = _lineDefaultColor;
+        }
+    }
+
+    public void HighlightRoute(Route route)
+    {
+        ResetLines();
+        for (var i = 0; i < route.Count - 1; i++)
+        {
+            var line = _lines.First(pair => 
+                new NodePair(route[i], route[i + 1]) == pair.Value
+                ).Key;
+            line.Stroke = _routeColor;
+        }
     }
 }

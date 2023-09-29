@@ -50,7 +50,8 @@ namespace AI_labs.UI
                 Home = Canvas.StartPoint
             });
             var res = aco.Optimize();
-            Result.Text = $"{string.Join(" ", res)} ({res.Length})";
+            Result.Text = $"Length: {res.Length}";
+            Canvas.HighlightRoute(res);
         }
     }
 }

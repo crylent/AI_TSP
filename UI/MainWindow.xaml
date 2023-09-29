@@ -21,7 +21,7 @@
             Background="Bisque"
             x:Name="Canvas"/>
         <StackPanel Grid.Column="1" Margin="10">
-            <ComboBox>
+            <ComboBox FontSize="15">
                 <ComboBoxItem Content="Ant Colony Optimization" IsSelected="True"/>
             </ComboBox>
             <Grid Margin="10">
@@ -34,54 +34,54 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="200"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Text="α (Pheromone Impact)"/>
+                <TextBlock Grid.Row="0" Text="α (Pheromone Impact)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="0"
                          x:Name="Alpha"
-                         Text="1"
+                         Text="1" FontSize="15"
                          PreviewTextInput="OnFloatParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}"/>
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="β (Length Impact)"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="β (Length Impact)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="1"
                          x:Name="Beta"
-                         Text="3"
+                         Text="3" FontSize="15"
                          PreviewTextInput="OnFloatParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}" />
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="ρ (Evaporation)"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="ρ (Evaporation)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="2"
                          x:Name="Evaporation"
-                         Text="0,5"
+                         Text="0,5" FontSize="15"
                          PreviewTextInput="OnFloatParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}" />
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="Q (Pheromone Gain)"/>
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Q (Pheromone Gain)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="3"
                          x:Name="PheromoneGain"
-                         Text="100"
+                         Text="100" FontSize="15"
                          PreviewTextInput="OnFloatParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}" />
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="N (Ants Number)"/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="N (Ants Number)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="4"
                          x:Name="AntsNumber"
-                         Text="20"
+                         Text="20" FontSize="15"
                          PreviewTextInput="OnIntParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}" />
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="T (Colony Lifetime)"/>
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="T (Colony Lifetime)" FontSize="15"/>
                 <TextBox Grid.Column="1" Grid.Row="5"
                          x:Name="ColonyLifetime"
-                         Text="100"
+                         Text="100" FontSize="15"
                          PreviewTextInput="OnIntParameterChanged" 
                          CommandManager.PreviewExecuted="CommandManager_OnPreviewExecuted"
                          ContextMenu="{x:Null}" />
             </Grid>
-            <Button Content="Start Optimization" Click="StartOptimization"/>
-            <TextBlock x:Name="Result"/>
+            <Button Content="Start Optimization" Click="StartOptimization" FontSize="15"/>
+            <TextBlock Margin="10" x:Name="Result" FontSize="15"/>
         </StackPanel>
     </Grid>
 </Window>
