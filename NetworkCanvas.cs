@@ -28,8 +28,15 @@ public class NetworkCanvas: Canvas
         ShadowDepth = 3
     };
 
-    private readonly Network _network = new(0);
+    private readonly MutableNetwork<int> _network = new();
+    public Network<int> Network => _network; // read-only
     private readonly List<Ellipse> _nodes = new();
+
+    public int StartPoint
+    {
+        get;
+        private set;
+    }
 
     private struct NodePair
     {
@@ -110,6 +117,7 @@ public class NetworkCanvas: Canvas
                 element.MouseLeftButtonDown += OnNodeClicked;
                 element.MouseEnter += HighlightNode;
                 element.MouseLeave += ResetNode;
+                element.MouseRightButtonDown += PromptNodeContextMenu;
                 break;
             case Line:
                 element.MouseLeftButtonDown += PromptLengthDialog;
@@ -145,6 +153,35 @@ public class NetworkCanvas: Canvas
                 RemoveNode(ellipse);
                 break;
         }
+    }
+
+    private void PromptNodeContextMenu(object sender, MouseButtonEventArgs e)
+    {
+        var ellipse = (sender as Ellipse)!;
+        var contextMenu = new ContextMenu();
+        var nodeIndex = GetNodeIndex(ellipse);
+        AddContextMenuItem(contextMenu, new MenuItem
+        {
+            Header = "Start Point",
+            IsCheckable = true,
+            IsChecked = StartPoint == nodeIndex
+        }, (_, _) => StartPoint = nodeIndex);
+        AddContextMenuItem(contextMenu, new MenuItem
+        {
+            Header = "Remove Node"
+        }, (_, _) => RemoveNode(ellipse));
+        ellipse.ContextMenu = contextMenu;
+    }
+
+    private static void AddContextMenuItem(ItemsControl menu, MenuItem item, RoutedEventHandler handler)
+    {
+        item.Click += handler;
+        menu.Items.Add(item);
+    }
+
+    private void a(object sender, RoutedEventArgs routedEventArgs)
+    {
+        
     }
 
     private void SelectNode(Ellipse node)
@@ -201,6 +238,9 @@ public class NetworkCanvas: Canvas
     private void RemoveNode(Ellipse node)
     {
         var nodeIndex = GetNodeIndex(node);
+        
+        if (nodeIndex == StartPoint) StartPoint = 0; // reset start point
+        
         _nodes.RemoveAt(nodeIndex);
         _network.RemoveNode(nodeIndex);
         Children.Remove(node);
