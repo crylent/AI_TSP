@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.Serialization;
 
 namespace AI_labs.Network;
 
+[DataContract]
 public class Network<T> where T: INumber<T>
 {
-    protected readonly List<List<T>> Matrix = new();
+    [DataMember] protected readonly List<List<T>> Matrix = new();
     public int Size => Matrix.Count;
 
     public static readonly T? NoPath = default;
@@ -26,14 +28,15 @@ public class Network<T> where T: INumber<T>
         var length = Matrix[node1][node2];
         return length;
     }
-    
-    protected void ForEachPath(Func<int, int, object> func)
+
+    public void ForEachPath(Func<int, int, T, object?> func)
     {
         for (var i = 0; i < Size; i++)
         {
             for (var j = 0; j < Matrix[i].Count; j++)
             {
-                if (GetValue(i, j) != NoPath) func(i, j);
+                var value = GetValue(i, j);
+                if (value != NoPath) func(i, j, value);
             }
         }
     }

@@ -11,7 +11,7 @@ public class PheromoneNetwork: MutableNetwork<float>
 
     public void Evaporate()
     {
-        ForEachPath((i, j) => Matrix[i][j] *= 1f - _evaporation);
+        ForEachPath((i, j, _) => Matrix[i][j] *= 1f - _evaporation);
     }
 
     public void AddPheromone(int nodeA, int nodeB, float gain)

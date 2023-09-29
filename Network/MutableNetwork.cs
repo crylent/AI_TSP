@@ -1,8 +1,10 @@
 using System.Linq;
 using System.Numerics;
+using System.Runtime.Serialization;
 
 namespace AI_labs.Network;
 
+[DataContract]
 public class MutableNetwork<T>: Network<T> where T : INumber<T>
 {
     public MutableNetwork(int size = 0, T? defaultValue = default) : base(size, defaultValue)

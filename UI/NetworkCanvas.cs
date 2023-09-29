@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -7,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using AI_labs.Files;
 using AI_labs.Network;
 
 namespace AI_labs.UI;
@@ -31,6 +31,8 @@ public class NetworkCanvas: Canvas
         ShadowDepth = 3
     };
 
+    public int Test = 1;
+
     private readonly MutableNetwork<int> _network = new();
     public Network<int> Network => _network; // read-only
     private readonly List<Ellipse> _nodes = new();
@@ -41,55 +43,13 @@ public class NetworkCanvas: Canvas
         private set;
     }
 
-    private readonly struct NodePair
-    {
-        public readonly int A;
-        public readonly int B;
-
-        // ReSharper disable once MemberCanBePrivate.Local
-        public NodePair(int nodeA, int nodeB)
-        {
-            A = nodeA;
-            B = nodeB;
-        }
-
-        public NodePair(Ellipse nodeA, Ellipse nodeB, Func<Ellipse, int> getNodeIndex) 
-            : this(getNodeIndex(nodeA), getNodeIndex(nodeB)) 
-        { }
-
-        // ReSharper disable once MemberCanBePrivate.Local
-        public bool Equals(NodePair other)
-        {
-            return A == other.A && B == other.B || A == other.B && B == other.A;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is NodePair other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                // ReSharper disable once ArrangeRedundantParentheses
-                return (A * 397) ^ B + (B * 397) ^ A;
-            }
-        }
-
-        public static bool operator ==(NodePair left, NodePair right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(NodePair left, NodePair right)
-        {
-            return !left.Equals(right);
-        }
-    }
-
     private readonly Dictionary<Line, NodePair> _lines = new();
     private readonly Dictionary<Line, Label> _labels = new();
+
+    public NetworkCanvas()
+    {
+        Background = Brushes.Bisque;
+    }
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
@@ -124,9 +84,8 @@ public class NetworkCanvas: Canvas
 
     private bool _preventCanvasClick;
 
-    private void AddNode(Point position)
+    public void AddNode(Point position)
     {
-        
         _network.AddNode();
         var node = new Ellipse
         {
@@ -211,7 +170,7 @@ public class NetworkCanvas: Canvas
         item.Click += handler;
         menu.Items.Add(item);
     }
-
+    
     private void SelectNode(Ellipse node)
     {
         if (_selectedNode == null)
@@ -234,24 +193,6 @@ public class NetworkCanvas: Canvas
             if (length != null) // add path with defined length
             {
                 AddPath(_selectedNode, node, (int) length);
-                _lineFromSelectedNode!.X2 = GetLeft(node) + NodeHalfSize;
-                _lineFromSelectedNode.Y2 = GetTop(node) + NodeHalfSize;
-                SetupListeners(_lineFromSelectedNode);
-                _lines.Add(_lineFromSelectedNode, new NodePair(_selectedNode, node, GetNodeIndex));
-
-                var text = new Label
-                {
-                    Content = length.ToString(),
-                    FontSize = LabelFontSize,
-                    Foreground = _labelColor,
-                    FontWeight = FontWeights.Bold,
-                    Background = _translucentBlack,
-                    Effect = _shadowEffect
-                };
-                Children.Add(text);
-                SetLeft(text, (_lineFromSelectedNode.X1 + _lineFromSelectedNode.X2) / 2);
-                SetTop(text, (_lineFromSelectedNode.Y1 + _lineFromSelectedNode.Y2) / 2);
-                _labels.Add(_lineFromSelectedNode, text);
             }
             else // cancel adding path
             {
@@ -293,9 +234,35 @@ public class NetworkCanvas: Canvas
         _selectedNode = null;
     }
 
+    public void AddPath(int from, int to, int length)
+    {
+        _selectedNode = null;
+        SelectNode(_nodes[from]);
+        AddPath(_nodes[from], _nodes[to], length);
+        _lineFromSelectedNode = null;
+    }
+
     private void AddPath(Ellipse from, Ellipse to, int length)
     {
         _network.AddPath(GetNodeIndex(from), GetNodeIndex(to), length);
+        _lineFromSelectedNode!.X2 = GetLeft(to) + NodeHalfSize;
+        _lineFromSelectedNode.Y2 = GetTop(to) + NodeHalfSize;
+        SetupListeners(_lineFromSelectedNode);
+        _lines.Add(_lineFromSelectedNode, new NodePair(from, to, GetNodeIndex));
+
+        var text = new Label
+        {
+            Content = length.ToString(),
+            FontSize = LabelFontSize,
+            Foreground = _labelColor,
+            FontWeight = FontWeights.Bold,
+            Background = _translucentBlack,
+            Effect = _shadowEffect
+        };
+        Children.Add(text);
+        SetLeft(text, (_lineFromSelectedNode.X1 + _lineFromSelectedNode.X2) / 2);
+        SetTop(text, (_lineFromSelectedNode.Y1 + _lineFromSelectedNode.Y2) / 2);
+        _labels.Add(_lineFromSelectedNode, text);
     }
 
     private void HighlightLine(object sender, MouseEventArgs e)
@@ -341,5 +308,10 @@ public class NetworkCanvas: Canvas
                 ).Key;
             line.Stroke = _routeColor;
         }
+    }
+
+    public NetworkOnCanvas GetData()
+    {
+        return new NetworkOnCanvas(_network, _nodes);
     }
 }

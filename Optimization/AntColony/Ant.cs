@@ -12,11 +12,11 @@ public class Ant
     private readonly PheromoneNetwork _pheromones;
     
     private readonly Route _route;
-    public static Route BestRoute
+    public static Route? BestRoute
     {
         get;
         private set;
-    } = null!;
+    }
 
     public Ant(AntColonyOptimization.Parameters @params, Network<int> network, PheromoneNetwork pheromones)
     {
@@ -47,7 +47,7 @@ public class Ant
             AntGoNextNode();
         }
         AntReturnHome();
-        if (BestRoute == null! || _route.Length < BestRoute.Length)
+        if (BestRoute is null || _route.Length < BestRoute.Length)
         {
             BestRoute = _route.Copy; // save best route
         }
@@ -96,5 +96,10 @@ public class Ant
     {
         var length = _network.GetValue(a, b);
         return length != Network<int>.NoPath ? length : 999999; // replace NoPath with big number to avoid dead ends
+    }
+
+    public static void ResetBestRoute()
+    {
+        BestRoute = null;
     }
 }

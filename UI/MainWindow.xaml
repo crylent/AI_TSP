@@ -17,10 +17,23 @@
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
         
-        <ui:NetworkCanvas
-            Background="Bisque"
-            x:Name="Canvas"/>
+        <DockPanel x:Name="CanvasArea">
+            <ui:NetworkCanvas
+                x:Name="Canvas"/>
+        </DockPanel>
         <StackPanel Grid.Column="1" Margin="10">
+            <Grid Margin="0, 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Graph Network" FontSize="15"/>
+                <Button Grid.Column="1" HorizontalAlignment="Stretch" Content="New" FontSize="15" Click="NewNetwork"/>
+                <Button Grid.Column="2" HorizontalAlignment="Stretch" Content="Open" FontSize="15" Click="OpenNetwork"/>
+                <Button Grid.Column="3" HorizontalAlignment="Stretch" Content="Save" FontSize="15" Click="SaveNetwork"/>
+            </Grid>
             <ComboBox FontSize="15">
                 <ComboBoxItem Content="Ant Colony Optimization" IsSelected="True"/>
             </ComboBox>
@@ -81,7 +94,7 @@
                          ContextMenu="{x:Null}" />
             </Grid>
             <Button Content="Start Optimization" Click="StartOptimization" FontSize="15"/>
-            <TextBlock Margin="10" x:Name="Result" FontSize="15"/>
+            <TextBlock Margin="0,10" x:Name="Result" FontSize="15"/>
         </StackPanel>
     </Grid>
 </Window>

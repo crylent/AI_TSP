@@ -35,13 +35,14 @@ public class AntColonyOptimization: IOptimizationAlgorithm
     {
         Init();
         Start();
-        return Ant.BestRoute;
+        return Ant.BestRoute!;
     }
 
     private void Init()
     {
         _pheromone = new PheromoneNetwork(_network.Size, _params.Evaporation);
         _ants = Enumerable.Repeat(new Ant(_params, _network, _pheromone), _params.AntsNumber).ToList();
+        Ant.ResetBestRoute();
     }
 
     private void Start()
