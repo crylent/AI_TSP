@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using AI_labs.Files;
 using AI_labs.Optimization.AntColony;
 using Microsoft.Win32;
@@ -52,8 +53,9 @@ namespace AI_labs.UI
                 Home = Canvas.StartPoint
             });
             var res = aco.Optimize();
-            Result.Text = $"Length: {res.Length}";
-            Canvas.HighlightRoute(res);
+            (Result.Text, Result.Foreground) = Canvas.HighlightRoute(res) ?
+                ($"Length: {res.Length}", Brushes.Black) : 
+                ("Can't construct a cycle", Brushes.Red);
         }
 
         private const string FileFilter = "Graph Network | *.gnw";

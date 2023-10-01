@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -299,15 +300,24 @@ public class NetworkCanvas: Canvas
         }
     }
 
-    public void HighlightRoute(Route route)
+    public bool HighlightRoute(Route route)
     {
         ResetLines();
-        for (var i = 0; i < route.Count - 1; i++)
+        try
         {
-            var line = _lines.First(pair => 
-                new NodePair(route[i], route[i + 1]) == pair.Value
+            for (var i = 0; i < route.Count - 1; i++)
+            {
+                var line = _lines.First(pair =>
+                    new NodePair(route[i], route[i + 1]) == pair.Value
                 ).Key;
-            line.Stroke = _routeColor;
+                line.Stroke = _routeColor;
+            }
+            return true;
+        }
+        catch (InvalidOperationException) // can't draw a cycle
+        {
+            ResetLines();
+            return false;
         }
     }
 
