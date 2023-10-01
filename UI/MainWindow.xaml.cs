@@ -51,7 +51,6 @@ namespace AI_labs.UI
                 ColonyLifetime = int.Parse(ColonyLifetime.Text),
                 Home = Canvas.StartPoint
             });
-            var test = Canvas.Network.Size;
             var res = aco.Optimize();
             Result.Text = $"Length: {res.Length}";
             Canvas.HighlightRoute(res);

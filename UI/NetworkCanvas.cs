@@ -277,6 +277,7 @@ public class NetworkCanvas: Canvas
 
     private void PromptLengthDialog(object sender, MouseButtonEventArgs e)
     {
+        _preventCanvasClick = true;
         var line = (sender as Line)!;
         var nodes = _lines[line];
         var initialLength = _network.GetValue(nodes.A, nodes.B);

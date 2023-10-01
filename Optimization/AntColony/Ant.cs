@@ -66,6 +66,13 @@ public class Ant
 
     private int SelectNextNode()
     {
+        if (_route.Count + 1 == _network.Size) // skip random choice when only node is available
+        {
+            for (var i = 0; i < _network.Size; i++)
+            {
+                if (!_route.Contains(i)) return i;
+            }
+        }
         var probs = new List<float>(_network.Size);
         for (var i = 0; i < _network.Size; i++)
         {
