@@ -4,9 +4,8 @@ using AI_labs.Network;
 
 namespace AI_labs.Optimization.AntColony;
 
-public class AntColonyOptimization: IOptimizationAlgorithm
+public class AntColonyOptimization: OptimizationAlgorithm
 {
-    private readonly Network<int> _network;
     private PheromoneNetwork _pheromone = null!;
 
     public class Parameters
@@ -25,13 +24,12 @@ public class AntColonyOptimization: IOptimizationAlgorithm
 
     private List<Ant> _ants = null!;
 
-    public AntColonyOptimization(Network<int> network, Parameters @params)
+    public AntColonyOptimization(Network<int> network, Parameters @params) : base(network)
     {
-        _network = network;
         _params = @params;
     }
 
-    public Route Optimize()
+    public override Route Optimize()
     {
         Init();
         Start();
@@ -40,8 +38,8 @@ public class AntColonyOptimization: IOptimizationAlgorithm
 
     private void Init()
     {
-        _pheromone = new PheromoneNetwork(_network.Size, _params.Evaporation);
-        _ants = Enumerable.Repeat(new Ant(_params, _network, _pheromone), _params.AntsNumber).ToList();
+        _pheromone = new PheromoneNetwork(Network.Size, _params.Evaporation);
+        _ants = Enumerable.Repeat(new Ant(_params, Network, _pheromone), _params.AntsNumber).ToList();
         Ant.ResetBestRoute();
     }
 

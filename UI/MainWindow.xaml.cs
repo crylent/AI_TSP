@@ -1,9 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using AI_labs.Files;
+using AI_labs.Optimization;
 using AI_labs.Optimization.AntColony;
+using AI_labs.Optimization.SimulatedAnnealing;
 using Microsoft.Win32;
 
 namespace AI_labs.UI
@@ -40,19 +43,34 @@ namespace AI_labs.UI
             }
         }
 
+        private Algorithm _algorithm = Algorithm.AntColonyOptimization;
+
         private void StartOptimization(object sender, RoutedEventArgs e)
         {
-            var aco = new AntColonyOptimization(Canvas.Network, new AntColonyOptimization.Parameters 
+            OptimizationAlgorithm optimizationAlgorithm = _algorithm switch
             {
-                Alpha = float.Parse(Alpha.Text),
-                Beta = float.Parse(Beta.Text),
-                Evaporation = float.Parse(Evaporation.Text),
-                PheromoneGain = float.Parse(PheromoneGain.Text),
-                AntsNumber = int.Parse(AntsNumber.Text),
-                ColonyLifetime = int.Parse(ColonyLifetime.Text),
-                Home = Canvas.StartPoint
-            });
-            var res = aco.Optimize();
+                Algorithm.AntColonyOptimization => new AntColonyOptimization(Canvas.Network,
+                    new AntColonyOptimization.Parameters
+                    {
+                        Alpha = float.Parse(Alpha.Text),
+                        Beta = float.Parse(Beta.Text),
+                        Evaporation = float.Parse(Evaporation.Text),
+                        PheromoneGain = float.Parse(PheromoneGain.Text),
+                        AntsNumber = int.Parse(AntsNumber.Text),
+                        ColonyLifetime = int.Parse(ColonyLifetime.Text),
+                        Home = Canvas.StartPoint
+                    }),
+                Algorithm.SimulatedAnnealing => new SimulatedAnnealing(Canvas.Network,
+                    new SimulatedAnnealing.Parameters
+                    {
+                        InitialTemperature = float.Parse(InitTemp.Text),
+                        TargetTemperature = float.Parse(TargetTemp.Text),
+                        CoolingRate = float.Parse(CoolingRate.Text),
+                        Home = Canvas.StartPoint
+                    }),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            var res = optimizationAlgorithm.Optimize();
             (Result.Text, Result.Foreground) = Canvas.HighlightRoute(res) ?
                 ($"Length: {res.Length}", Brushes.Black) : 
                 ("Can't construct a cycle", Brushes.Red);
@@ -106,6 +124,29 @@ namespace AI_labs.UI
             {
                 Canvas.AddPath(path.NodeA, path.NodeB, path.Length);
             }
+        }
+
+        private void OnAlgorithmSelected(object? sender, EventArgs eventArgs)
+        {
+            AntColonyParams.Visibility = Visibility.Collapsed;
+            AnnealingParams.Visibility = Visibility.Collapsed;
+            switch (Algorithms.SelectedIndex)
+            {
+                case 0: OnAntColonySelected(); break;
+                case 1: OnSimulatedAnnealingSelected(); break;
+            }
+        }
+
+        private void OnAntColonySelected()
+        {
+            AntColonyParams.Visibility = Visibility.Visible;
+            _algorithm = Algorithm.AntColonyOptimization;
+        }
+
+        private void OnSimulatedAnnealingSelected()
+        {
+            AnnealingParams.Visibility = Visibility.Visible;
+            _algorithm = Algorithm.SimulatedAnnealing;
         }
     }
 }
