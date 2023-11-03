@@ -86,10 +86,7 @@ namespace AI_labs.UI
         private void NewNetwork()
         {
             CanvasArea.Children.Remove(Canvas);
-            var canvas = new NetworkCanvas()
-            {
-                Test = Canvas.Test + 1
-            };
+            var canvas = new NetworkCanvas();
             CanvasArea.Children.Add(canvas);
             Canvas = canvas;
         }

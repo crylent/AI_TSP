@@ -32,8 +32,6 @@ public class NetworkCanvas: Canvas
         ShadowDepth = 3
     };
 
-    public int Test = 1;
-
     private readonly MutableNetwork<int> _network = new();
     public Network<int> Network => _network; // read-only
     private readonly List<Ellipse> _nodes = new();
